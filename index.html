@@ -681,6 +681,35 @@
     transform: scale(1.1);  /* Makes it "pop" when hovered over */
     background-color: #128c7e; /* Darker green on hover */
 }
+.added-products{
+    background-color: #96a19537;
+    padding: 50px;
+}
+h1{
+    display: flex;
+    justify-content: center;
+}
+.back-to-top-icon{
+    font-size: 20px;
+    position: fixed;        /* Makes it stay in place */
+    bottom: 90px;           /* Distance from the bottom */
+    right: 10px;             /* Distance from the left side */
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+}
+.back-to-top-icon a{
+    font-size: 10px;
+    color: black;
+    text-decoration: none;
+}
         
     </style>
 </head>
@@ -753,7 +782,7 @@
                             <a href="admin-login.html" class="nav-link-custom">Shop</a>
                             <a href="fruits.html" class="nav-link-custom">Fruits</a>
                             <a href="vegitable.html" class="nav-link-custom">Vegetables</a>
-                            <a href="#" class="nav-link-custom">About</a>
+                            <a href="#About" class="nav-link-custom">About</a>
                         </div>
                     </div>
                 </div>
@@ -784,7 +813,7 @@
 
                 <div class="d-flex align-items-center gap-4 mb-5 flex-wrap">
                     <button class="btn-shop">Shop Now <i class="bi bi-arrow-right"></i></button>
-                    <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-2 border-warning">View All Products</a>
+                    <a href="#products" class="text-dark fw-bold text-decoration-none border-bottom border-2 border-warning">View All Products</a>
                 </div>
 
                 <div class="rating-box">
@@ -844,7 +873,7 @@
               </div>
             </div>
             <div class="heading d-flex justify-content-center text-success">
-               <a href="vegetables">Vegetables</a>
+               <a href="vegitable.html">Vegetables</a>
             </div>
             <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -877,7 +906,7 @@
               </div>
             </div>
             <div class="heading d-flex justify-content-center text-success">
-               <a href="vegetables">Fresh Fruits</a>
+               <a href="fruits.html">Fresh Fruits</a>
             </div>
             <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -910,7 +939,7 @@
           </div>
         </div>
         <div class="heading d-flex justify-content-center text-success">
-           <a href="vegetables">Milk & Egg</a>
+           <a href="milk.html">Milk & Egg</a>
         </div>
         <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -943,7 +972,7 @@
           </div>
         </div>
         <div class="heading d-flex justify-content-center text-success">
-           <a href="vegetables">Bakery</a>
+           <a href="bakery.html">Bakery</a>
         </div>
         <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -976,7 +1005,7 @@
           </div>
         </div>
         <div class="heading d-flex justify-content-center text-success">
-           <a href="vegetables">Households</a>
+           <a href="households.html">Households</a>
         </div>
         <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -1032,9 +1061,6 @@
         </div>
     </div>
 
-    <div class="row g-4" id="featuredProducts">
-        <!-- Products will be loaded by JavaScript -->
-    </div>
 </div>
 
     <!-- Swiper Slider -->
@@ -1129,6 +1155,15 @@
         </div>
         <!-- Pagination dots -->
         <div class="swiper-pagination"></div>
+    </div>
+    <div class="added-products" id="products">
+        <section class="added-product-section">
+            <h1>Products</h1>
+            <!-- added products -->
+            <div class="row g-4" id="addedproducts">
+                <!-- Products will be loaded by JavaScript -->
+            </div>
+        </section>
     </div>
 </div>
 <!-- deals week special section -->
@@ -1362,12 +1397,15 @@
 </section>
 
 <!-- #whatsapp icons -->
+<div class="back-to-top-icon" id="#home">
+    <a href="#">back to top<i class="fa-solid fa-arrow-up" style="color:black"></i></a>
+</div>
 <a href="https://wa.me/254XXXXXXXXX?text=Hello%2C%20I%20would%20like%20to%20place%20an%20order" class="whatsapp-float" target="_blank">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="Order on WhatsApp">
 </a>
 
 <!-- Main Footer -->
-<footer class="main-footer">
+<footer class="main-footer" id="About">
     <div class="container">
         <div class="row g-4">
             <!-- Brand Column -->
@@ -1448,7 +1486,7 @@
     // Load products from localStorage
     function loadProducts() {
         const products = JSON.parse(localStorage.getItem('mjgrocery_products')) || [];
-        const container = document.getElementById('featuredProducts');
+        const container = document.getElementById('addedproducts');
         container.innerHTML = '';
     
         products.forEach(product => {

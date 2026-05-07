@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MJ Grocery - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { --primary-green: #157347; }
+        body { background-color: #f8f9fa; }
+        .sidebar { background-color: var(--primary-green); color: white; min-height: 100vh; }
+        .nav-link { color: white !important; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.2) !important; }
+        .product-img-preview { max-height: 120px; object-fit: contain; }
+        th { background-color: var(--primary-green); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar p-3">
+            <h4 class="text-center mb-4"><i class="bi bi-basket-fill"></i> MJ Grocery</h4>
+            <ul class="nav flex-column">
+                <li><a href="#" class="nav-link active" onclick="showSection('products')"><i class="bi bi-box"></i> Products</a></li>
+                <li><a href="#" class="nav-link" onclick="showSection('categories')"><i class="bi bi-tags"></i> Categories</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 p-4">
+            <div class="d-flex justify-content-between mb-4">
+                <h2 id="pageTitle">Manage Products</h2>
+                <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#changePassModal">
+                    Change Password
+                </button>
+                <button class="btn btn-danger" onclick="logout()">Logout</button>
+            </div>
+
+            <!-- Products Section -->
+            <div id="products-section">
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#productModal">
+                    <i class="bi bi-plus-lg"></i> Add New Product
+                </button>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="productsTable">
+                        <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+                        <tbody id="productsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Categories Section -->
+            <div id="categories-section" style="display:none;">
+                <button class="btn btn-primary mb-3" onclick="addCategory()">Add New Category</button>
+                <ul class="list-group" id="categoriesList"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Add New Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+
+                    <div class="mb-3">
+                        <label>Product Image</label><br>
+                        <input type="file" id="imageUpload" accept="image/*" class="form-control">
+                        <img id="imagePreview" class="mt-2 product-img-preview d-none" alt="Preview">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Product Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Category</label>
+                            <select class="form-select" id="category" required></select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label>Price ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="price" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Old Price ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="oldPrice">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Weight</label>
+                            <input type="text" class="form-control" id="weight" placeholder="500g" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Save Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-control" id="currentPassword">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="newPass">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirmNewPass">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="changePassword()">Update Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Button to open modal (Add this in your sidebar or settings page) -->
+<button class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+    <i class="bi bi-key"></i> Change Password
+</button>
+<!-- In admin.html sidebar or settings -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function changePassword() {
+    const current = document.getElementById('currentPassword').value;
+    const newPass = document.getElementById('newPass').value;
+    const confirm = document.getElementById('confirmNewPass').value;
+
+    if (!current || !newPass || !confirm) return alert("All fields are required");
+    if (newPass !== confirm) return alert("New passwords do not match");
+    if (newPass.length < 6) return alert("Password must be at least 6 characters");
+
+    fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            currentPassword: current,
+            newPassword: newPass
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ Password changed successfully!");
+            bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+            // Clear fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPass').value = '';
+            document.getElementById('confirmNewPass').value = '';
+        } else {
+            alert(data.message || "Failed to change password");
+        }
+    });
+}
+// Check Login
+if (!localStorage.getItem('adminLoggedIn')) {
+    window.location.href = 'admin-login.html';
+}
+
+let products = JSON.parse(localStorage.getItem('mjgrocery_products')) || [];
+let categories = JSON.parse(localStorage.getItem('mjgrocery_categories')) || ["Fruits", "Vegetables", "Bakery", "Dairy Products", "Snacks", "Household"];
+
+// Render Categories in Dropdown
+function populateCategories() {
+    const select = document.getElementById('category');
+    select.innerHTML = '';
+    categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        select.appendChild(opt);
+    });
+}
+
+// Image Preview + Base64
+document.getElementById('imageUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('imagePreview').src = ev.target.result;
+            document.getElementById('imagePreview').classList.remove('d-none');
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+function saveProducts() {
+    localStorage.setItem('mjgrocery_products', JSON.stringify(products));
+}
+
+function renderProducts() {
+    const tbody = document.getElementById('productsBody');
+    tbody.innerHTML = '';
+    products.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><img src="${p.image}" class="product-img-preview rounded"></td>
+            <td>${p.name}</td>
+            <td>${p.category}</td>
+            <td>$${p.price}</td>
+            <td>
+                <button class="btn btn-sm btn-warning" onclick="editProduct(${i})">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${i})">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Categories Management
+function renderCategories() {
+    const list = document.getElementById('categoriesList');
+    list.innerHTML = '';
+    categories.forEach((cat, i) => {
+        const li = document.createElement('li');
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+        li.innerHTML = `
+            ${cat}
+            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${i})">Delete</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+function addCategory() {
+    const name = prompt("Enter new category name:");
+    if (name && !categories.includes(name)) {
+        categories.push(name);
+        localStorage.setItem('mjgrocery_categories', JSON.stringify(categories));
+        populateCategories();
+        renderCategories();
+    }
+}
+
+function deleteCategory(i) {
+    if (confirm("Delete this category?")) {
+        categories.splice(i, 1);
+        localStorage.setItem('mjgrocery_categories', JSON.stringify(categories));
+        populateCategories();
+        renderCategories();
+    }
+}
+
+// Show Section
+function showSection(section) {
+    document.getElementById('products-section').style.display = section === 'products' ? 'block' : 'none';
+    document.getElementById('categories-section').style.display = section === 'categories' ? 'block' : 'none';
+    document.getElementById('pageTitle').textContent = section === 'products' ? 'Manage Products' : 'Manage Categories';
+}
+
+// Form Submit
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const imageSrc = document.getElementById('imagePreview').src || "https://via.placeholder.com/300";
+
+    const product = {
+        name: document.getElementById('name').value,
+        category: document.getElementById('category').value,
+        price: parseFloat(document.getElementById('price').value),
+        oldPrice: document.getElementById('oldPrice').value ? parseFloat(document.getElementById('oldPrice').value) : null,
+        weight: document.getElementById('weight').value,
+        image: imageSrc,
+        rating: 4.8
+    };
+
+    const id = document.getElementById('productId').value;
+    if (id) products[id] = product;
+    else products.push(product);
+
+    saveProducts();
+    renderProducts();
+    bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+    this.reset();
+    document.getElementById('imagePreview').classList.add('d-none');
+});
+
+function editProduct(i) {
+    const p = products[i];
+    document.getElementById('productId').value = i;
+    document.getElementById('name').value = p.name;
+    document.getElementById('category').value = p.category;
+    document.getElementById('price').value = p.price;
+    document.getElementById('oldPrice').value = p.oldPrice || '';
+    document.getElementById('weight').value = p.weight;
+    document.getElementById('imagePreview').src = p.image;
+    document.getElementById('imagePreview').classList.remove('d-none');
+
+    document.getElementById('modalTitle').textContent = 'Edit Product';
+    new bootstrap.Modal(document.getElementById('productModal')).show();
+}
+
+function deleteProduct(i) {
+    if (confirm('Delete product?')) {
+        products.splice(i, 1);
+        saveProducts();
+        renderProducts();
+    }
+}
+
+function logout() {
+    if (confirm('Logout?')) {
+        localStorage.removeItem('adminLoggedIn');
+        window.location.href = 'admin-login.html';
+    }
+}
+
+// Initialize
+populateCategories();
+renderProducts();
+renderCategories();
+</script>
+</body>
+</html>
